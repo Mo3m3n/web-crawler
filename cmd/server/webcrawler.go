@@ -8,11 +8,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/mo3m3n/webcrawler/crawler"
 	"github.com/mo3m3n/webcrawler/logger"
 	"github.com/mo3m3n/webcrawler/site"
 )
 
-// web-crawler options
+// webcrawler options
 const addr = "127.0.0.1:8080"
 const timeout = 300
 const maxconn = 5
@@ -34,11 +35,11 @@ var args options
 var conn chan struct{}
 
 func getParams() {
-	addrPtr := flag.String("address", addr, "the TCP network address the web-crawler is going to listen to")
-	timeoutPtr := flag.Int("timeout", timeout, "the number of seconds the web-crawler is going to wait for a crawl operation before interrupting it")
-	maxconnPtr := flag.Int("maxconn", maxconn, "the maximum number of concurrent requests the web-crawler can accept")
-	rateLimitPtr := flag.Int("ratelimit", ratelimit, "the maximum number of requests/second the web-crawler is allowed to send to a given website")
-	logPtr := flag.Int("log", int(loglevel), "the web-crawler logging level: 1=error, 2=warning, 3=info, 4=debug")
+	addrPtr := flag.String("address", addr, "the TCP network address the webcrawler is going to listen to")
+	timeoutPtr := flag.Int("timeout", timeout, "the number of seconds the webcrawler is going to wait for a crawl operation before interrupting it")
+	maxconnPtr := flag.Int("maxconn", maxconn, "the maximum number of concurrent requests the webcrawler can accept")
+	rateLimitPtr := flag.Int("ratelimit", ratelimit, "the maximum number of requests/second the webcrawler is allowed to send to a given website")
+	logPtr := flag.Int("log", int(loglevel), "the webcrawler logging level: 1=error, 2=warning, 3=info, 4=debug")
 	flag.Parse()
 	args.address = *addrPtr
 	args.timeout = *timeoutPtr
@@ -82,7 +83,7 @@ func requestHandler(writer http.ResponseWriter, request *http.Request) {
 		}
 		// Crawl
 		log.Infof("starting crawler for url '%s' and depth '%d'", url, depth)
-		sitemap, err = crawl(request.Context(), url, args.ratelimit, depth, log)
+		sitemap, err = crawler.Crawl(request.Context(), url, args.timeout, args.ratelimit, depth, log)
 		if err != nil {
 			http.Error(writer, err.Error(), http.StatusNotAcceptable)
 			log.Errorf("crawling request failed: %s", err)

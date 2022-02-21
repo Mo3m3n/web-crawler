@@ -1,4 +1,4 @@
-package main
+package crawler
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func parseURL(p *url.URL, urlString string) (*url.URL, error) {
 }
 
 // crawls a website starting from a rool url and using a Breadth First Search algorithm via a local queue
-func crawl(ctx context.Context, rootURL string, ratelimit, maxDepth int, log logger.Logger) (site.SiteMap, error) {
+func Crawl(ctx context.Context, rootURL string, timeout, ratelimit, maxDepth int, log logger.Logger) (site.SiteMap, error) {
 	var queue []site.URLNode
 	var parent, child site.URLNode
 	var result []string
@@ -46,7 +46,7 @@ func crawl(ctx context.Context, rootURL string, ratelimit, maxDepth int, log log
 	hostname := rootNode.GetHostName()
 	limiter := ratelimiter.Get(hostname, ratelimit)
 	defer ratelimiter.Stop(hostname)
-	fetcher := fetcher.New(limiter, args.timeout)
+	fetcher := fetcher.New(limiter, timeout)
 	// Crawl
 	queue = []site.URLNode{rootNode}
 	for {
