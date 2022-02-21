@@ -19,10 +19,10 @@ type URLNode interface {
 }
 
 type node struct {
-	url      *url.URL
-	depth    int
-	Path     string
-	Children []URLNode
+	url   *url.URL
+	depth int
+	Path  string
+	URLs  []URLNode
 }
 
 func (n *node) GetURL() *url.URL {
@@ -39,11 +39,11 @@ func (n *node) GetDepth() int {
 }
 func (n *node) Marshal() ([]byte, error) {
 	return json.Marshal(struct {
-		Path    string
-		Childen []URLNode
+		Path string
+		URLs []URLNode
 	}{
-		Path:    n.GetPath(),
-		Childen: n.Children,
+		Path: n.GetPath(),
+		URLs: n.URLs,
 	})
 }
 
@@ -51,9 +51,9 @@ func (n *node) Marshal() ([]byte, error) {
 // and its depths in the sitemap and creates a new url node
 func NewURLNode(u *url.URL, depth int) URLNode {
 	return &node{
-		url:      u,
-		depth:    depth,
-		Path:     u.Path,
-		Children: []URLNode{},
+		url:   u,
+		depth: depth,
+		Path:  u.Path,
+		URLs:  []URLNode{},
 	}
 }

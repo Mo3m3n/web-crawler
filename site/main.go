@@ -59,7 +59,7 @@ func (s siteMap) AddChild(parent, child URLNode) error {
 	if node == nil {
 		return fmt.Errorf("internal error with url node '%v'", parent)
 	}
-	node.Children = append(node.Children, child)
+	node.URLs = append(node.URLs, child)
 	s.visited[nodePath] = true
 	return nil
 }
