@@ -17,6 +17,9 @@ func parseURL(p *url.URL, urlString string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
+	if u.Path == "" {
+		u.Path = "/"
+	}
 	// handle relative url
 	if u.Host == "" && p != nil {
 		u.Host = p.Host
