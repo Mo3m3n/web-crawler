@@ -73,16 +73,29 @@ Usage of ./webcrawler:
 ### Client
 Eventhough any HTTP client can be used, this project provides a dedicated client via `go install github.com/mo3m3n/webcrawler/cmd/client`
 ```
-webcralwer <address> <url> [depth]
+webcralwer [options] <server-url> <url>
 
-  address: the TCP network address of the webcrawler.
-  url: the starting url to crawl from.
-  depth: the extent/level to which the webcrawler fetchs links. -1 means no limit.
+  server-url: the url of the webcrawler. Example: 'http://127.0.0.1:8080/'
+  url: the starting url to crawl from. Example: 'https://example.com/foo'
+
+  options:
+    -depth
+          the extent/level to which the webcrawler fetchs links. -1 means no limit.
+    -insecure
+          ignore server certificate verification when connecting over TLS
+    -pass string
+          password to be used for basic http authentication
+    -username string
+          username to be used for basic http authentication
 
 ```
 
-Example:
-`webcrawler http://<crawler-address>/crawl https://example.com/foo 4`
+Examples:
+- Directly request:
+  `webcrawler -depth=3 http://<crawler-address>/crawl https://example.com/foo`
+
+- If the webcrawler service is behind a proxy handling TLS encryption and basic authentication.
+  `webcrawler -username=<username> -pass=<pass> -depth=3 https://<crawler-address>/crawl https://example.com/foo`
 
 ## RoadMap
 - Add tests
