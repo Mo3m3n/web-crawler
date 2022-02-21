@@ -15,6 +15,7 @@ import (
 
 // webcrawler options
 const addr = "127.0.0.1:8080"
+const path = "/crawl"
 const timeout = 300
 const maxconn = 5
 const ratelimit = 1
@@ -23,6 +24,7 @@ const loglevel logger.LogLevel = logger.Info
 
 type options struct {
 	address   string
+	path      string
 	timeout   int
 	maxconn   int
 	ratelimit int
@@ -36,12 +38,14 @@ var conn chan struct{}
 
 func getParams() {
 	addrPtr := flag.String("address", addr, "the TCP network address the webcrawler is going to listen to")
+	pathPtr := flag.String("path", path, "the path where the webcrawser is processing crawl requests")
 	timeoutPtr := flag.Int("timeout", timeout, "the number of seconds the webcrawler is going to wait for a crawl operation before interrupting it")
 	maxconnPtr := flag.Int("maxconn", maxconn, "the maximum number of concurrent requests the webcrawler can accept")
 	rateLimitPtr := flag.Int("ratelimit", ratelimit, "the maximum number of requests/second the webcrawler is allowed to send to a given website")
 	logPtr := flag.Int("log", int(loglevel), "the webcrawler logging level: 1=error, 2=warning, 3=info, 4=debug")
 	flag.Parse()
 	args.address = *addrPtr
+	args.path = *pathPtr
 	args.timeout = *timeoutPtr
 	args.maxconn = *maxconnPtr
 	args.ratelimit = *rateLimitPtr
@@ -105,14 +109,28 @@ func requestHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+func healthzHandler(writer http.ResponseWriter, request *http.Request) {
+	_, err := writer.Write([]byte(fmt.Sprintf(args.path)))
+	if err != nil {
+		fmt.Printf("Error: failed to answer health check: %s\n", err)
+	}
+}
+
 func main() {
 	getParams()
 	conn = make(chan struct{}, args.maxconn)
-	fmt.Printf("Starting web crawler at '%s'\n", args.address)
+	mux := http.NewServeMux()
+	mux.HandleFunc(args.path, requestHandler)
+	mux.HandleFunc("/healthz", healthzHandler)
+	if args.path != "/" {
+		mux.HandleFunc("/", healthzHandler)
+	}
+
+	fmt.Printf("Starting web crawler at '%s%s'\n", args.address, args.path)
 	fmt.Printf("Using options: maxconn %d, ratelmit %d, timeout %d\n", args.maxconn, args.ratelimit, args.timeout)
 	server := http.Server{
 		Addr:         args.address,
-		Handler:      http.TimeoutHandler(http.HandlerFunc(requestHandler), time.Duration(args.timeout)*time.Second, "Timeout!\n"),
+		Handler:      http.TimeoutHandler(mux, time.Duration(args.timeout)*time.Second, "Timeout!\n"),
 		WriteTimeout: time.Duration(args.timeout) * time.Second * 2, // Should be higher than handler timeout to close connection properly
 	}
 	err := server.ListenAndServe()

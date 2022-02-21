@@ -57,6 +57,8 @@ It can be installed via `go install github.com/mo3m3n/webcrawler/cmd/server`
 Usage of ./webcrawler:
   -address string
         the TCP network address the webcrawler is going to listen to (default "127.0.0.1:8080")
+  -path string
+        the path where the webcrawser is processing crawl requests (default "/crawl")
   -log int
         the webcrawler logging level: 1=error, 2=warning, 3=info, 4=debug (default 3)
   -maxconn int
@@ -77,6 +79,9 @@ webcralwer <address> <url> [depth]
   depth: the extent/level to which the webcrawler fetchs links. -1 means no limit.
 
 ```
+
+Example:
+`webcrawler http://<crawler-address>/crawl https://example.com/foo 4`
 
 ## RoadMap
 - Add tests
