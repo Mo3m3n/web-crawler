@@ -38,13 +38,13 @@ func (n *node) GetDepth() int {
 	return n.depth
 }
 func (n *node) Marshal() ([]byte, error) {
-	return json.Marshal(struct {
+	return json.MarshalIndent(struct {
 		Path string
 		URLs []URLNode
 	}{
 		Path: n.GetPath(),
 		URLs: n.URLs,
-	})
+	}, "", "  ")
 }
 
 // NewURLNode takes a url (as URL pointer from net/url)
