@@ -38,6 +38,7 @@ func NewSiteMap(root URLNode, maxDepth int) siteMap {
 }
 
 func (s siteMap) AddChild(parent, child URLNode) error {
+	var err error
 	nodeDepth := child.GetDepth()
 	nodeHostName := child.GetHostName()
 	parentHostName := parent.GetHostName()
@@ -46,22 +47,24 @@ func (s siteMap) AddChild(parent, child URLNode) error {
 	if s.maxDepth >= 0 && nodeDepth > s.maxDepth {
 		return ErrInvalidNode(fmt.Errorf("url depth '%d' exceeds max depth '%d'", nodeDepth, s.maxDepth))
 	}
+	if s.visited[nodePath] {
+		err = ErrCachedNode(fmt.Errorf("path '%s' was already visited", child.GetURL().String()))
+	}
 	if nodeHostName != parentHostName {
-		return ErrInvalidNode(fmt.Errorf("hostname '%s' is different fromt parent one '%s'", nodeHostName, parentHostName))
+		err = ErrInvalidNode(fmt.Errorf("hostname '%s' is different fromt parent one '%s'", nodeHostName, parentHostName))
 	}
 	if !strings.HasPrefix(nodePath, parentPath) {
-		return ErrInvalidNode(fmt.Errorf("path '%s' is different fromt parent one '%s'", nodePath, parentPath))
-	}
-	if s.visited[nodePath] {
-		return ErrCachedNode(fmt.Errorf("path '%s' was already visited", child.GetURL().String()))
+		err = ErrInvalidNode(fmt.Errorf("path '%s' is different fromt parent one '%s'", nodePath, parentPath))
 	}
 	node := parent.(*node)
 	if node == nil {
 		return fmt.Errorf("internal error with url node '%v'", parent)
 	}
 	node.URLs = append(node.URLs, child)
-	s.visited[nodePath] = true
-	return nil
+	if err == nil {
+		s.visited[nodePath] = true
+	}
+	return err
 }
 
 func (s siteMap) Marshal() ([]byte, error) {
