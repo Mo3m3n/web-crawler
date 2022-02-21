@@ -52,7 +52,8 @@ For example if the crawl request is for 'http://example.com/foo', the result wil
 
 ### Server
 The main binary is the server one.  
-It can be installed via `go install github.com/mo3m3n/webcrawler/cmd/server` 
+It can be installed via `go install github.com/mo3m3n/webcrawler/cmd/server`   
+It is also available via a docker conainer at `mo3m3n/webcrawler:latest`
 ```
 Usage of ./webcrawler:
   -address string
