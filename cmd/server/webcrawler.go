@@ -86,7 +86,6 @@ func requestHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 		}
 		// Crawl
-		log.Infof("starting crawler for url '%s' and depth '%d'", url, depth)
 		sitemap, err = crawler.Crawl(request.Context(), url, args.timeout, args.ratelimit, depth, log)
 		if err != nil {
 			http.Error(writer, err.Error(), http.StatusNotAcceptable)
@@ -103,8 +102,6 @@ func requestHandler(writer http.ResponseWriter, request *http.Request) {
 		_, err = writer.Write(bytes)
 		if err != nil {
 			log.Errorf("unable to write response back to client: %s", err)
-		} else {
-			log.Infof("crawling request for '%s' finished", url)
 		}
 	}
 }
