@@ -12,39 +12,20 @@ The crawl result is sent as a **JSON** payload.
 For example if the crawl request is for 'http://example.com/foo', the result will look like:
 ```json
 {
-  "Path": "/foo",
-  "URLs": [
-    {
-      "Path": "/foo/bar1",
-      "URLs": [
-        {
-          "Path": "/foo/bar1/toto",
-          "URLs": []
-        },
-      ]
+  "/foo": {
+    "/foo/bar1": {
+      "/foo/bar1/toto": {},
+      },
+    "/foor/bar2": {},
+    "/foo/bar3": {
+      "/foo/bar3/toto1": {},
+      "/foo/bar3/toto2": {},
     },
-    {
-      "Path": "/foor/bar2",
-      "URLs": []
-    },
-    {
-      "Path": "/foo/bar3",
-      "URLs": [
-        {
-          "Path": "/foo/bar3/toto1",
-          "URLs": []
-        },
-        {
-          "Path": "/foo/bar3/toto2",
-          "URLs": []
-        },
-      ]
-    },
-    {
-      "Path": "/foo/bar3",
-      "URLs": []
-    }
-  ]
+  },
+  "/abc": {},
+  "/xyz": {
+    "/xyz/toto": {},
+  },
 }
 ```
 

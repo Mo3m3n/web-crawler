@@ -1,6 +1,7 @@
 package site
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -60,7 +61,9 @@ func (s siteMap) AddChild(parent, child URLNode) error {
 	if node == nil {
 		return fmt.Errorf("internal error with url node '%v'", parent)
 	}
-	node.URLs = append(node.URLs, child)
+	if _, ok := node.urls[nodePath]; !ok {
+		node.urls[nodePath] = child
+	}
 	if err == nil {
 		s.visited[nodePath] = true
 	}
@@ -68,5 +71,5 @@ func (s siteMap) AddChild(parent, child URLNode) error {
 }
 
 func (s siteMap) Marshal() ([]byte, error) {
-	return s.root.Marshal()
+	return json.MarshalIndent(s.root, "", "  ")
 }
